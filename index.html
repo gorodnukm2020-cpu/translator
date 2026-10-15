@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Перекладач UA ➔ EN</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4834d4, #6c5ce7);
+            color: #333;
+            text-align: center;
+            padding: 15px;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* НАПІВПРОЗОРИЙ ДЕКОР ФОНУ */
+        .bg-shape {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.07);
+            pointer-events: none;
+            z-index: 0;
+            animation: bgFloat 10s infinite alternate ease-in-out;
+        }
+        .shape1 { width: 250px; height: 250px; top: -30px; left: -30px; }
+        .shape2 { width: 300px; height: 300px; bottom: -50px; right: -50px; animation-delay: -3s; }
+        .shape3 { width: 150px; height: 150px; top: 40%; right: 5%; animation-delay: -5s; }
+
+        @keyframes bgFloat {
+            0% { transform: translateY(0px) scale(1); }
+            100% { transform: translateY(15px) scale(1.05); }
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+        h1 {
+            color: #4834d4;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            color: #636e72;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        .section {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px dashed #a29bfe;
+        }
+        textarea {
+            padding: 12px;
+            width: 100%;
+            font-size: 16px;
+            border: 2px solid #a29bfe;
+            border-radius: 12px;
+            outline: none;
+            transition: 0.3s;
+            resize: none;
+            font-family: inherit;
+        }
+        textarea:focus {
+            border-color: #0984e3;
+            box-shadow: 0 0 12px rgba(9, 132, 227, 0.3);
+        }
+        button.translate-btn {
+            padding: 12px 25px;
+            background-color: #0984e3;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 12px;
+            width: 100%;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        button.translate-btn:hover {
+            background-color: #0070c0;
+        }
+        #result {
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3436;
+            padding: 12px;
+            background: #f1f2f6;
+            border-radius: 12px;
+            border-left: 6px solid #0984e3;
+            min-height: 45px;
+            word-break: break-word;
+        }
+
+        /* ІНСТРУКЦІЯ ТА КАРТКИ */
+        .instruction-box {
+            background: #eccc68;
+            color: #2f3542;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .cards-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .word-card {
+            background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+            color: white;
+            border: none;
+            padding: 12px 14px;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3);
+            flex: 1 1 22%; /* Більше карток в ряд */
+            min-width: 120px;
+            transition: all 0.3s ease;
+        }
+
+        .word-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .word-card.opened {
+            background: #2d3436 !important;
+            color: #ffeaa7;
+            transform: none;
+        }
+
+        .refresh-cards-btn {
+            margin-top: 12px;
+            padding: 10px 18px;
+            background-color: #6c5ce7;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            width: 100%;
+            transition: 0.2s;
+        }
+
+        .refresh-cards-btn:hover {
+            background-color: #4834d4;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-shape shape1"></div>
+    <div class="bg-shape shape2"></div>
+    <div class="bg-shape shape3"></div>
+
+    <div class="container">
+        <h1>💜 Перекладач UA ➔ EN </h1>
+        <p class="subtitle">Перекладай детально, правильно та з усмішкою! 😊</p>
+        
+        <div class="section" style="border-top: none; margin-top: 0; padding-top: 0;">
+            <textarea id="wordInput" rows="3" placeholder="Введи слово або речення..."></textarea>
+            <br>
+            <button class="translate-btn" onclick="translateText()">Перекласти</button>
+            <div id="result">Тут з'явиться переклад... 😉</div>
+        </div>
+
+        <div class="section">
+            <h3>🎲 Гра «Відгадай та вивчи»</h3>
+            
+            <div class="instruction-box">
+                💡 <strong>Інструкція:</strong> Натискай на картки, щоб відкрити переклад. Для нових унікальних слів тисни <strong>«🔄 Ще»</strong>!
+            </div>
+
+            <div class="cards-grid" id="cardsContainer"></div>
+            
+            <button class="refresh-cards-btn" onclick="createCards()">🔄 Ще нові слова</button>
+        </div>
+    </div>
+
+    <script>
+        // Величезна база слів без повторів
+        const dictionary = {
+            "похибка": "error / tolerance", "помилка": "mistake / error", "машина": "car",
+            "автомобіль": "car", "комп'ютер": "computer", "телефон": "phone",
+            "клавіатура": "keyboard", "миша": "mouse", "дизайн": "design",
+            "гра": "game", "код": "code", "будинок": "house", "сонце": "sun",
+            "книга": "book", "друг": "friend", "школа": "school", "літак": "airplane",
+            "вода": "water", "яблуко": "apple", "мова": "language", "музика": "music",
+            "фільм": "movie", "камера": "camera", "фото": "photo", "відео": "video",
+            "інтернет": "internet", "сайт": "website", "програма": "program", "пароль": "password",
+            "кіт": "cat", "собака": "dog", "небо": "sky", "дерево": "tree", "квітка": "flower",
+            "дорога": "road", "місто": "city", "село": "village", "гроші": "money", "магазин": "shop",
+            "музикант": "musician", "саксофон": "saxophone", "фотографія": "photography", "об'єктив": "lens",
+            "скутер": "scooter", "акумулятор": "battery", "швидкість": "speed", "драйв": "drive",
+            "щастя": "happiness", "усмішка": "smile", "успіх": "success", "знання": "knowledge",
+            "майбутнє": "future", "мрія": "dream", "робота": "work", "час": "time"
+        };
+
+        function getMatchingEmoji(text) {
+            let lower = text.toLowerCase();
+            if (lower.includes("car") || lower.includes("авто")) return " 🚗";
+            if (lower.includes("error") || lower.includes("mistake")) return " ⚠️";
+            if (lower.includes("sun") || lower.includes("сонце")) return " ☀️";
+            if (lower.includes("game") || lower.includes("гра")) return " 🎮";
+            if (lower.includes("book") || lower.includes("книг")) return " 📚";
+            if (lower.includes("computer") || lower.includes("комп")) return " 💻";
+            if (lower.includes("music") || lower.includes("саксофон")) return " 🎷";
+            return " ✨";
+        }
+
+        async function translateText() {
+            let userInput = document.getElementById("wordInput").value.trim();
+            let resultDiv = document.getElementById("result");
+
+            if (userInput === "") {
+                resultDiv.innerText = "Будь ласка, введи слово або речення! 😊";
+                resultDiv.style.color = "#e67e22";
+                return;
+            }
+
+            resultDiv.innerText = "Шукаю найкращий переклад... ⏳";
+            resultDiv.style.color = "#6c5ce7";
+
+            let cleanInput = userInput.toLowerCase();
+
+            if (dictionary[cleanInput]) {
+                let translation = dictionary[cleanInput];
+                translation = translation.charAt(0).toUpperCase() + translation.slice(1);
+                resultDiv.innerText = translation + getMatchingEmoji(translation);
+                resultDiv.style.color = "#0984e3";
+                return;
+            }
+
+            try {
+                let url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(userInput)}&langpair=uk|en`;
+                let response = await fetch(url);
+                let data = await response.json();
+
+                if (data && data.responseData && data.responseData.translatedText) {
+                    let translated = data.responseData.translatedText;
+
+                    translated = translated.replace(/[*_~]/g, "").trim();
+                    translated = translated.charAt(0).toUpperCase() + translated.slice(1);
+
+                    let lastChar = userInput.slice(-1);
+                    if ([".", ",", "?", "!", ";", ":", "'", "\""].includes(lastChar)) {
+                        if (![".", ",", "?", "!", ";", ":", "'", "\""].includes(translated.slice(-1))) {
+                            translated += lastChar;
+                        }
+                    } else if (userInput.includes(" ") && !/[.!?]$/.test(translated)) {
+                        translated += ".";
+                    }
+
+                    resultDiv.innerText = translated + getMatchingEmoji(translated);
+                    resultDiv.style.color = "#0984e3";
+                } else {
+                    resultDiv.innerText = "Не вдалося знайти точну відповідність. Спробуй інше слово! 😅";
+                    resultDiv.style.color = "#d63031";
+                }
+            } catch (error) {
+                resultDiv.innerText = "Помилка підключення до мережі. Перевір інтернет! 🌐";
+                resultDiv.style.color = "#d63031";
+            }
+        }
+
+        document.getElementById("wordInput").addEventListener("keydown", function(event) {
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                translateText();
+            }
+        });
+
+        const cardEntries = Object.entries(dictionary);
+
+        function createCards() {
+            let container = document.getElementById("cardsContainer");
+            container.innerHTML = "";
+
+            // Повністю перемішуємо всю велику базу без повторів у поточному наборі
+            let shuffled = [...cardEntries].sort(() => Math.random() - 0.5);
+
+            // Виводимо одразу 8 унікальних карток замість 4
+            for (let i = 0; i < 8; i++) {
+                let [ukr, eng] = shuffled[i];
+                let btn = document.createElement("button");
+                btn.className = "word-card";
+                btn.innerText = "❓ " + ukr;
+
+                btn.onclick = function() {
+                    if (!btn.classList.contains("opened")) {
+                        btn.classList.add("opened");
+                        btn.innerText = `${ukr} = ${eng}`;
+                    }
+                };
+
+                container.appendChild(btn);
+            }
+        }
+
+        window.onload = createCards;
+    </script>
+
+</body>
+</html>
